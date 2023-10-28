@@ -1,0 +1,33 @@
+{
+  "name": "axios-smart",
+  "version": "0.0.1",
+  "description": "axios helper",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "scripts": {
+    "dev": "father dev",
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "prepublishOnly": "father doctor && npm run build",
+    "release": "npm publish --registry=https://registry.npmjs.org/"
+  },
+  "keywords": [],
+  "authors": [
+    "me@dkvirus.com"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "father": "^4.3.6"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "is-retry-allowed": "^3.0.0"
+  }
+}

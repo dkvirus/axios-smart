@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="cancelRepeat(5)">测试请求,5s后拿到响应</button>
+    <button onclick="cancelRepeat(4)">测试请求,4s后拿到响应</button>
+    <button onclick="cancelRepeat(3)">测试请求,3s后拿到响应</button>
+    <button onclick="retry()">测试请求重试</button>
+    <button onclick="cancel()">取消所有请求</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <script src="../dist/umd/axios-smart.min.js"></script>
+    <script>
+        axiosSmart(axios, {
+            retry: {
+                enable: true,
+                retryCondition: (error) => error.response?.status !== 200,
+            },
+        })
+
+        function cancelRepeat(second) {
+            axios.get(`https://httpbin.org/delay/${second}`)
+        }
+
+        function retry() {
+            axios.get('https://httpbin.org/status/400')
+        }
+
+        function cancel() {
+            cancelPending()
+        }
+    </script>
+</body>
+</html>
