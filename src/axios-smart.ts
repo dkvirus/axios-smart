@@ -1,11 +1,15 @@
-import axios, { AxiosRequestConfig, AxiosStatic } from 'axios'
+import axios, { AxiosStatic } from 'axios'
+import { useEffect } from 'react'
 import axiosRetry from './axios-retry';
+import { IAxiosSmartOptions, RequestConfig } from './iaxios-smart-options'
+import { mergeOptions } from './options';
+import { loadingBar } from './loading-bar';
 
 // 存储每个请求中的 map
 export const pendingXHRMap = new Map()
 
 // 生成请求键
-const generateRequestKey = (config: AxiosRequestConfig & Record<string, any>) => {
+const generateRequestKey = (config: RequestConfig, includeRetryCount = true) => {
     const { method, url } = config
     const key = [
         (method || 'get').toLowerCase(),
@@ -13,7 +17,7 @@ const generateRequestKey = (config: AxiosRequestConfig & Record<string, any>) =>
         /**
          * 加上 retryCount 是为了兼容 axios-retry, 否则 axios-retry 会由于 cancel-repeat 不会生效
          */
-        config?.['axios-retry']?.retryCount,
+        includeRetryCount ? config?.['axios-retry']?.retryCount : '',
     ]
     .filter(item => item)
     .join(':');
@@ -21,42 +25,35 @@ const generateRequestKey = (config: AxiosRequestConfig & Record<string, any>) =>
 }
 
 // 添加到请求记录
-const addPendingXHR = (config: AxiosRequestConfig) => {
+const addPendingXHR = (config: RequestConfig, options: IAxiosSmartOptions) => {
     config.cancelToken = config.cancelToken || new axios.CancelToken(cancel => {
         const duplicatedKey = generateRequestKey(config)
-        if (duplicatedKey && !pendingXHRMap.has(duplicatedKey)) {
-            pendingXHRMap.set(duplicatedKey, cancel)
+        if (!duplicatedKey || pendingXHRMap.has(duplicatedKey)) return
+        pendingXHRMap.set(duplicatedKey, cancel)
+        if (options.loading?.enable) {
+            options.loading.start?.()
         }
     })
 }
 
 // 删除请求记录
-const removePendingXHR = (config: AxiosRequestConfig & Record<string, any>) => {
-    const duplicatedKey = generateRequestKey(config)
+const removePendingXHR = (config: RequestConfig, options: IAxiosSmartOptions, includeRetryCount = true) => {
+    const duplicatedKey = generateRequestKey(config, includeRetryCount)
     if (duplicatedKey && pendingXHRMap.has(duplicatedKey)) {
         const cancel = pendingXHRMap.get(duplicatedKey)
         cancel(duplicatedKey)
         pendingXHRMap.delete(duplicatedKey)
+        if (pendingXHRMap.size === 0 && options.loading?.enable) {
+            options.loading.done?.()
+        }
     }
 }
 
-export interface IAxiosRetryOptions {
-    enable?: boolean;
-    retries?: number;
-    [key: string]: any;
-}
+const axiosSmart = (axios: AxiosStatic, options?: IAxiosSmartOptions) => {
+    const opts = mergeOptions(options) 
 
-export interface IAxiosHelperOptions {
-    /**
-     * axios-retry
-     */
-    retry?: IAxiosRetryOptions;
-    [key: string]: any;
-}
-
-const axiosSmart = (axios: AxiosStatic, options?: IAxiosHelperOptions) => {
-    if (options?.retry?.enable) {
-        axiosRetry(axios, { ...options?.retry })
+    if (opts?.retry?.enable) {
+        axiosRetry(axios, { ...opts?.retry })
     }
 
     const requestInterceptorId = axios.interceptors.request.use(
@@ -64,22 +61,22 @@ const axiosSmart = (axios: AxiosStatic, options?: IAxiosHelperOptions) => {
             /**
              * 发一个接口, 还没有接收到 response 时发第二个同样的接口, removePendingXHR() 会把第一个接口取消掉
              */
-            removePendingXHR(config)
-            addPendingXHR(config)
+            removePendingXHR(config, opts)
+            addPendingXHR(config, opts)
             return config
         },
     )
 
     const responseInterceptorId = axios.interceptors.response.use(
         response => {
-            removePendingXHR(response.config)
+            removePendingXHR(response.config, opts)
             return response
         },
         error => {
             if (axios.isCancel(error)) {
                 return new Promise(() => { })
             }
-            removePendingXHR(error.response.config)
+            removePendingXHR(error.response.config, opts, false)
             return Promise.reject(error)
         },
     )
@@ -92,6 +89,15 @@ export const cancelPending = () => {
         cancel(duplicatedKey)
     })
     pendingXHRMap.clear()
+    loadingBar.done()
+}
+
+export const useCancelPendingWhenLeavePage = () => {
+    useEffect(() => {
+        return () => {
+          cancelPending()
+        }
+    }, [ window.location.pathname ])
 }
 
 export default axiosSmart

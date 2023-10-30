@@ -1,0 +1,23 @@
+.axios-smart-progress-bar {
+  position: fixed;
+  z-index: 99999999;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background-color: #ec7765;
+}
+
+.axios-smart-progress-bar-animation {
+  animation: axios-smart-progress-bar-loading 60s ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes axios-smart-progress-bar-loading {
+  0% {
+    width: 1%;
+  }
+
+  100% {
+    width: 98%;
+  }
+}
