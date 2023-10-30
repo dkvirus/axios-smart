@@ -4,6 +4,14 @@
   "description": "axios helper",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
+  "homepage": "https://github.com/dkvirus/axios-smart",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dkvirus/axios-smart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dkvirus/axios-smart/issues"
+  },
   "scripts": {
     "dev": "father dev",
     "build": "father build",
