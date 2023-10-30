@@ -87,7 +87,7 @@ axios.get('https://httpbin.org/status/503')
 
 retry.retries: 定义重试次数，默认值是 2
 
-retry.retryCondition: 定义重试条件，默认是响应状态吗不等于200时进行重试
+retry.retryCondition: 定义重试条件，默认是响应状态码不等于200时进行重试
 
 ``` js
 axiosSmart(axios, {
