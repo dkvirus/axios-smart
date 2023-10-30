@@ -123,6 +123,15 @@ axiosSmart(axios, {
 axios.get('https://httpbin.org/delay/5')
 ```
 
+You can use the loadingBar alone anywhere
+
+``` js
+import { loadingBar } from 'axios-smart'
+
+loadingBar.start()
+loadingBar.done()
+```
+
 If you need to change the style of the progress bar, you can override these class names directly in the global css file
 
 ``` css
