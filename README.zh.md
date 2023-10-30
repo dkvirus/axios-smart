@@ -3,23 +3,21 @@
 [![NPM version](https://img.shields.io/npm/v/axios-smart.svg?style=flat)](https://npmjs.org/package/axios-smart)
 [![NPM downloads](http://img.shields.io/npm/dm/axios-smart.svg?style=flat)](https://npmjs.org/package/axios-smart)
 
-[中文文档](./README.zh.md)
-
-## Install
+## 安装
 
 ```bash
 $ yarn install axios-smart
 ```
 
-## Usage
+## 用法
 
-axios-smart is a collection of small features.
+axios-smart是一些小特性的集合。
 
 - axios-cancel-repeat
 
-The first time the request is sent, then the query condition is modified so that the second request is sent even though the first request has not yet finished. At this point, the return result of the first request becomes worthless and we should cancel the first request.
+第一次发送请求，修改查询条件，即使第一个请求尚未完成，也发送第二个请求。此时，第一个请求的返回结果变得毫无价值，我们应该取消第一个请求。
 
-Once you use axios-smart, the axios-cancel-repeat feature is automatically available, and you cannot cancel it.
+一旦您使用了 axios-smart, axios-cancel-repeat 特性将自动可用，并且您不能取消它。
 
 ``` js
 import axios from 'axios'
@@ -30,9 +28,9 @@ axiosSmart(axios)
 
 - axios-cancel-pending
 
-To jump from one page to another, uncompleted requests on the first page should be canceled.
+从一个页面跳转到另一个页面，应该取消前一个页面上未完成的请求。
 
-You can customize how to cancel requests in any project.
+您可以在任何项目中自定义如何取消请求。
 
 ``` js
 import axios from 'axios'
@@ -40,18 +38,18 @@ import { axiosSmart, cancelPending } from 'axios-smart'
 
 axiosSmart(axios)
 
-// Cancel all currently pending requests
+// 取消所有未完成的请求
 cancelPending()
 ```
 
-Here's an example in react:
+React 中使用例子:
 
 ``` js
 import axios from 'axios'
 import { axiosSmart, useCancelPendingWhenLeavePage } from 'axios-smart'
 
 /**
- *  useCancelPendingWhenLeavePage(): cancelPending() is also called internally
+ *  useCancelPendingWhenLeavePage(): cancelPending() 内部代码如下
  * 
  *  useEffect(() => {
  *      return () => {
@@ -68,11 +66,11 @@ axios.get('https://httpbin.org/status/503')
 
 - axios-retry
 
-Sometimes, due to unstable network, the first request fails, and the second request is successful after refreshing the page.
+有时由于网络不稳定，第一次请求失败，刷新页面后第二次请求成功。
 
-What axios-retry does is when the request fails, it is automatically resent twice. 
+axios-retry 会在请求失败时，自动重发请求，默认最多重试2次请求。
 
-If you do not want to resend the request, you can set it as follows.
+如果不想重新发送请求，可以按以下方式设置。
 
 ``` js
 import axios from 'axios'
@@ -80,22 +78,22 @@ import { axiosSmart } from 'axios-smart'
 
 axiosSmart(axios, {
     retry: {
-        enable: false,       // default value is true
+        enable: false,       // 默认值是 true
     }
 })
 
 axios.get('https://httpbin.org/status/503')
 ```
 
-retry.retries: Defines the number of retries. The default value is 2
+retry.retries: 定义重试次数，默认值是 2
 
-retry.retryCondition: Define the retry condition, the default is that the status code is not equal to 200 will retry
+retry.retryCondition: 定义重试条件，默认是响应状态吗不等于200时进行重试
 
 ``` js
 axiosSmart(axios, {
     retry: {
-        enable: true,       // default value is true
-        retries: 2,         // default value is 3
+        enable: true,       // 默认值是 true
+        retries: 2,         // 默认值是 2
         retryCondition: (error: AxiosError) => error.response?.status !== 200,
     }
 })
@@ -103,17 +101,18 @@ axiosSmart(axios, {
 
 - axios-loading
 
-When a request is sent, a progress bar is automatically added at the top of the browser.
-
-If you change the query condition and resent the request, the progress bar will reset and start again.
-
-When all the requests are finished, the progress bar will disappear automatically.
-
-If you don't want this feature, you'll need to turn it off manually.
+当发送请求时，浏览器顶部会自动添加一个进度条。 
+ 
+如果更改查询条件并重新发送请求，则进度条将重置并重新开始。 
+ 
+当所有请求完成后，进度条将自动消失。 
+ 
+如果您不想要这个功能，您需要手动关闭它。
 
 ``` js
 import axios from 'axios'
 import { axiosSmart } from 'axios-smart'
+// 需要引入进度条样式文件
 import 'axios-smart/dist/esm/axios-smart.css'
 
 axiosSmart(axios, {
@@ -125,7 +124,7 @@ axiosSmart(axios, {
 axios.get('https://httpbin.org/delay/5')
 ```
 
-You can use the loadingBar alone anywhere
+你可以在任何地方单独使用 loadingBar
 
 ``` js
 import { loadingBar } from 'axios-smart'
@@ -134,7 +133,7 @@ loadingBar.start()
 loadingBar.done()
 ```
 
-If you need to change the style of the progress bar, you can override these class names directly in the global css file
+如果你需要改变进度条的样式，你可以直接在全局css文件中覆盖这些类名
 
 ``` css
 .axios-smart-progress-bar {
@@ -162,7 +161,7 @@ If you need to change the style of the progress bar, you can override these clas
 }
 ```
 
-## Development
+## 开发
 
 ``` bash
 $ git clone git@github.com:dkvirus/axios-smart.git
@@ -171,7 +170,7 @@ $ yarn
 $ yarn dev
 ```
 
-You can modify the source code in the src directory and open test/axios-smart.html to test it.
+您可以修改 src 目录中的源代码，并打开 test/axios-smart.html 来测试它。
 
 ## LICENSE
 
