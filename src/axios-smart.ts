@@ -8,9 +8,21 @@ import { loadingBar } from './loading-bar';
 // 存储每个请求中的 map
 export const pendingXHRMap = new Map()
 
+const uuid = (): string => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8)
+        return v.toString(16)
+    })
+}
+
 // 生成请求键
 const generateRequestKey = (config: RequestConfig, includeRetryCount = true) => {
     const { method, url } = config
+    let cancelRepeatId = config?.cancelRepeatId || ''
+    if (config?.cancelRepeat) {
+        cancelRepeatId = uuid()
+    }
     const key = [
         (method || 'get').toLowerCase(),
         url,
@@ -18,6 +30,7 @@ const generateRequestKey = (config: RequestConfig, includeRetryCount = true) => 
          * 加上 retryCount 是为了兼容 axios-retry, 否则 axios-retry 会由于 cancel-repeat 不会生效
          */
         includeRetryCount ? config?.['axios-retry']?.retryCount : '',
+        cancelRepeatId,
     ]
     .filter(item => item)
     .join(':');
