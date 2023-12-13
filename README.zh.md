@@ -26,6 +26,36 @@ import { axiosSmart } from 'axios-smart'
 axiosSmart(axios)
 ```
 
+业务开发中会遇到同一个接口发多次的情况，添加 cancelRepeatId 参数即可。
+
+``` js
+axios.all([1,2,3].map(item => {
+  return axios.get('https://httpbin.org/delay/5', { cancelRepeatId: item })
+})).then(result => {
+  console.log('result', result)
+})
+```
+
+也可以使用 cancelRepeat 参数。
+
+``` js
+axios.all([1,2,3].map(item => {
+  return axios.get('https://httpbin.org/delay/5', { cancelRepeat: true })
+})).then(result => {
+  console.log('result', result)
+})
+```
+
+cancelRepeatId 和 cancelRepeat 的区别?
+
+并发发送多个接口，之前的接口未完成时再次点击按钮，cancelRepeatId 会取消之前的接口重发请求
+
+![cancelRepeatId](./imgs//cancelRepeatId.gif)
+
+而 cancelRepeat 不会取消之前的请求。
+
+![cancelRepeat](./imgs//cancelRepeat.gif)
+
 - axios-cancel-pending
 
 从一个页面跳转到另一个页面，应该取消前一个页面上未完成的请求。

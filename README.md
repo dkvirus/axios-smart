@@ -28,6 +28,36 @@ import { axiosSmart } from 'axios-smart'
 axiosSmart(axios)
 ```
 
+In development, the same interface is sent multiple times. You can add the cancelRepeatId parameter.
+
+``` js
+axios.all([1,2,3].map(item => {
+  return axios.get('https://httpbin.org/delay/5', { cancelRepeatId: item })
+})).then(result => {
+  console.log('result', result)
+})
+```
+
+You can also use the cancelRepeat parameter.
+
+``` js
+axios.all([1,2,3].map(item => {
+  return axios.get('https://httpbin.org/delay/5', { cancelRepeat: true })
+})).then(result => {
+  console.log('result', result)
+})
+```
+
+The difference between cancelRepeatId and cancelRepeat:
+
+If the previous interface is not completed, click the button again. cancelRepeatId will cancel the previous interface retransmission request
+
+![cancelRepeatId](./imgs//cancelRepeatId.gif)
+
+cancelRepeat does not cancel the previous request.
+
+![cancelRepeat](./imgs//cancelRepeat.gif)
+
 - axios-cancel-pending
 
 To jump from one page to another, uncompleted requests on the first page should be canceled.

@@ -25,3 +25,11 @@ export interface IAxiosSmartOptions {
 }
 
 export type RequestConfig = AxiosRequestConfig & Record<string, any>
+
+// 扩展 axios/AxiosRequestConfig 属性
+declare module 'axios' {
+    export interface AxiosRequestConfig {
+      cancelRepeatId?: string;
+      cancelRepeat?: boolean;
+    }
+}
